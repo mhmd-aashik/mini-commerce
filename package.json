@@ -14,6 +14,7 @@
     "start:prod": "node dist/apps/mini-commerce/main",
     "start:gateway": "nest start api-gateway --watch",
     "build:gateway": "nest build api-gateway",
+    "test:gateway": "jest apps/api-gateway",
     "start:product": "nest start product-service --watch",
     "build:product": "nest build product-service",
     "test:product": "jest apps/product-service",
@@ -79,7 +80,14 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/apps/"
-    ]
+      "<rootDir>/apps/",
+      "<rootDir>/libs/"
+    ],
+    "moduleNameMapper": {
+      "^@app/common(|/.*)$": "<rootDir>/libs/common/src/$1",
+      "^@app/config(|/.*)$": "<rootDir>/libs/config/src/$1",
+      "^@app/grpc-contracts(|/.*)$": "<rootDir>/libs/grpc-contracts/src/$1",
+      "^@app/kafka-contracts(|/.*)$": "<rootDir>/libs/kafka-contracts/src/$1"
+    }
   }
 }
