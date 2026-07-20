@@ -3,7 +3,7 @@ import { ProductServiceController } from './product-service.controller';
 import { ProductServiceService } from './product-service.service';
 
 describe('ProductServiceController', () => {
-  let controller: ProductServiceController;
+  let productServiceController: ProductServiceController;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -11,12 +11,14 @@ describe('ProductServiceController', () => {
       providers: [ProductServiceService],
     }).compile();
 
-    controller = app.get<ProductServiceController>(ProductServiceController);
+    productServiceController = app.get<ProductServiceController>(
+      ProductServiceController,
+    );
   });
 
   describe('getServiceInformation', () => {
     it('should return the Product Service information', () => {
-      expect(controller.getServiceInformation()).toEqual({
+      expect(productServiceController.getServiceInformation()).toEqual({
         service: 'product-service',
         status: 'running',
         version: '1.0.0',
