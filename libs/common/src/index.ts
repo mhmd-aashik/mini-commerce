@@ -16,3 +16,9 @@ export * from './logging/logging.module';
 export * from './logging/logging-options.factory';
 export * from './logging/logging.constants';
 export * from './logging/logging.types';
+
+// correlation
+export * from './correlation/correlation-id.constants';
+export * from './correlation/correlation-id.middleware';
+export * from './correlation/correlation-id.types';
+export * from './correlation/correlation-id.utils';

@@ -9,6 +9,7 @@ import { configureGlobalValidation } from './configure-validation';
 import { configureApiVersioning } from './configure-versioning';
 import { configureSecurityHeaders } from './configure-security';
 import { configureGracefulShutdown } from './configure-shutdown';
+import { correlationIdMiddleware } from '../correlation/correlation-id.middleware';
 
 export async function bootstrapHttpApplication(
   options: BootstrapHttpApplicationOptions,
@@ -17,6 +18,8 @@ export async function bootstrapHttpApplication(
     ...options.nestApplicationOptions,
     bufferLogs: true,
   });
+
+  app.use(correlationIdMiddleware);
 
   const nestLogger = app.get(PinoNestLogger);
 

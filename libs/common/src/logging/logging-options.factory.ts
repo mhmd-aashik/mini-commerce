@@ -1,19 +1,16 @@
 import { AppConfig } from '@app/config';
-import type { IncomingMessage, ServerResponse } from 'node:http';
-import type { TransportSingleOptions } from 'pino';
-import type { Params } from 'nestjs-pino';
+import { IncomingMessage } from 'node:http';
+import { TransportSingleOptions } from 'pino';
+import { Options as PinoHttpOptions } from 'pino-http';
+import { Params } from 'nestjs-pino';
+import { CORRELATION_ID_LOG_PROPERTY } from '../correlation/correlation-id.constants';
 import { REDACTED_LOG_VALUE, SENSITIVE_LOG_PATHS } from './logging.constants';
-import { Options } from 'pino-http';
+import type { ReqId } from 'pino-http';
 
-type PinoHttpOptions = Options<
-  IncomingMessage,
-  ServerResponse<IncomingMessage>,
-  never
->;
-
-type RequestWithId = IncomingMessage & {
-  id: number | string;
-};
+interface CorrelatedIncomingMessage extends IncomingMessage {
+  correlationId?: string;
+  id: ReqId;
+}
 
 interface SerializedRequest {
   id?: string | number;
@@ -22,13 +19,7 @@ interface SerializedRequest {
 }
 
 interface SerializedResponse {
-  statusCode: number;
-}
-
-interface SerializedError {
-  type: string;
-  message: string;
-  stack?: string;
+  statusCode?: number;
 }
 
 function createDevelopmentTransport(
@@ -60,13 +51,37 @@ export function createPinoLoggerOptions(appConfig: AppConfig): Params {
       environment: appConfig.nodeEnv,
     },
 
+    genReqId(request): string {
+      const correlatedRequest = request as CorrelatedIncomingMessage;
+
+      /*
+       * The correlation middleware should already have generated
+       * and assigned this value before pino-http executes.
+       */
+      const correlationId =
+        correlatedRequest.correlationId ?? crypto.randomUUID();
+
+      correlatedRequest.correlationId = correlationId;
+
+      correlatedRequest.id = correlationId;
+
+      return correlationId;
+    },
+
+    customProps(request) {
+      return {
+        [CORRELATION_ID_LOG_PROPERTY]: (request as CorrelatedIncomingMessage)
+          .correlationId,
+      };
+    },
+
     redact: {
       paths: [...SENSITIVE_LOG_PATHS],
       censor: REDACTED_LOG_VALUE,
     },
 
     serializers: {
-      req(request: RequestWithId): SerializedRequest {
+      req(request: SerializedRequest) {
         return {
           id: request.id,
           method: request.method,
@@ -74,17 +89,20 @@ export function createPinoLoggerOptions(appConfig: AppConfig): Params {
         };
       },
 
-      res(response: ServerResponse<IncomingMessage>): SerializedResponse {
+      res(response: SerializedResponse) {
         return {
           statusCode: response.statusCode,
         };
       },
 
-      err(error: Error): SerializedError {
+      err(error) {
         return {
-          type: error.constructor.name,
-          message: error.message,
-          stack: error.stack,
+          type:
+            error instanceof Error ? error.constructor.name : 'UnknownError',
+
+          message: error instanceof Error ? error.message : String(error),
+
+          stack: error instanceof Error ? error.stack : undefined,
         };
       },
     },
@@ -96,11 +114,11 @@ export function createPinoLoggerOptions(appConfig: AppConfig): Params {
       responseTime: 'durationMs',
     },
 
-    customSuccessMessage(): string {
+    customSuccessMessage() {
       return 'HTTP request completed';
     },
 
-    customErrorMessage(): string {
+    customErrorMessage() {
       return 'HTTP request failed';
     },
   };
