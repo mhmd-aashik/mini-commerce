@@ -10,8 +10,10 @@ export const environmentValidationSchema = Joi.object({
   PORT: Joi.number().port().required(),
 
   LOG_LEVEL: Joi.string()
-    .valid('error', 'warn', 'log', 'debug', 'verbose')
-    .default('log'),
+    .valid('fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent')
+    .default('info'),
+
+  LOG_PRETTY: Joi.boolean().truthy('true').falsy('false').default(false),
 
   API_PREFIX: Joi.string()
     .trim()

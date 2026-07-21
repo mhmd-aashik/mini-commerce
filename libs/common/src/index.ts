@@ -10,3 +10,9 @@ export * from './bootstrap/configure-security';
 export * from './bootstrap/configure-shutdown';
 export * from './bootstrap/configure-validation';
 export * from './bootstrap/configure-versioning';
+
+// pino pretty
+export * from './logging/logging.module';
+export * from './logging/logging-options.factory';
+export * from './logging/logging.constants';
+export * from './logging/logging.types';

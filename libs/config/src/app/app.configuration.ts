@@ -21,6 +21,7 @@ export const appConfiguration = registerAs('app', (): AppConfig => ({
   name: process.env.APP_NAME ?? 'unknown-service',
   port: Number(process.env.PORT),
   logLevel: process.env.LOG_LEVEL as LogLevel,
+  logPretty: parseBoolean(process.env.LOG_PRETTY),
   apiPrefix: process.env.API_PREFIX ?? 'api',
   apiVersion: process.env.API_VERSION ?? '1',
   corsEnabled: parseBoolean(process.env.CORS_ENABLED),
