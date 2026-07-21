@@ -4,7 +4,10 @@ import {
   ProductServiceService,
 } from './product-service.service';
 
-@Controller()
+@Controller({
+  path: '',
+  version: '1',
+})
 export class ProductServiceController {
   constructor(private readonly productServiceService: ProductServiceService) {}
 

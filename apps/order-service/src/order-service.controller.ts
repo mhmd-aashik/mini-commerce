@@ -4,7 +4,10 @@ import {
   OrderServiceService,
 } from './order-service.service';
 
-@Controller()
+@Controller({
+  path: '',
+  version: '1',
+})
 export class OrderServiceController {
   constructor(private readonly orderServiceService: OrderServiceService) {}
 

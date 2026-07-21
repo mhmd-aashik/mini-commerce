@@ -7,4 +7,8 @@ export interface AppConfig {
   name: string;
   port: number;
   logLevel: LogLevel;
+  apiPrefix: string;
+  apiVersion: string;
+  corsEnabled: boolean;
+  corsOrigins: string[];
 }

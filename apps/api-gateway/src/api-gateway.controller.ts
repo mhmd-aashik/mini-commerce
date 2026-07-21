@@ -4,7 +4,10 @@ import {
   ApiGatewayService,
 } from './api-gateway.service';
 
-@Controller()
+@Controller({
+  path: '',
+  version: '1',
+})
 export class ApiGatewayController {
   constructor(private readonly apiGatewayService: ApiGatewayService) {}
 
